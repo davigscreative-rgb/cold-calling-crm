@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply bg-white text-gray-700 border border-gray-200 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors;
+  }
+  .card {
+    @apply bg-white border border-gray-200 rounded-xl p-4;
+  }
+  .input {
+    @apply w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  }
+  .tag {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+  .tag-red {
+    @apply bg-red-50 text-red-700;
+  }
+  .tag-amber {
+    @apply bg-amber-50 text-amber-700;
+  }
+  .tag-green {
+    @apply bg-green-50 text-green-700;
+  }
+  .tag-blue {
+    @apply bg-blue-50 text-blue-700;
+  }
+}
+
+.skeleton {
+  @apply animate-pulse bg-gray-200 rounded;
+}
+
+/* Kanban board */
+.kanban-col {
+  @apply flex-shrink-0 w-60 flex flex-col gap-2;
+}
+
+.kanban-card {
+  @apply bg-white border border-gray-200 rounded-xl p-3 cursor-grab active:cursor-grabbing shadow-sm hover:border-blue-300 transition-colors;
+}
+
+.kanban-card.dragging {
+  @apply opacity-50 rotate-2 shadow-lg;
+}

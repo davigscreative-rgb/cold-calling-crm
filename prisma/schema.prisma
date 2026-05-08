@@ -1,0 +1,215 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                String         @id @default(cuid())
+  email             String         @unique
+  name              String?
+  avatarUrl         String?
+  plan              Plan           @default(FREE)
+  dailyGoalUsd      Float          @default(1000)
+  defaultIndustry   String?
+  defaultState      String?
+  scriptTone        ScriptTone     @default(PROFESSIONAL)
+  zoomAccessToken   String?
+  zoomRefreshToken  String?
+  zoomTokenExpiry   DateTime?
+  twilioEnabled     Boolean        @default(false)
+  emailEnabled      Boolean        @default(true)
+  followUp1Template String?
+  followUp2Template String?
+  apiKey            String?        @unique @default(cuid())
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  activityLog       ActivityLog[]
+  dailyStats        DailyStats[]
+  followUps         FollowUp[]
+  pipelineLeads     PipelineLead[]
+
+  @@map("users")
+}
+
+model LeadCache {
+  id                    String         @id @default(cuid())
+  city                  String
+  state                 String
+  industry              String
+  businessName          String
+  ownerName             String?
+  phone                 String?
+  address               String?
+  rating                Float?
+  reviewCount           Int?
+  hasWebsite            Boolean        @default(false)
+  websiteUrl            String?
+  websiteDead           Boolean        @default(false)
+  hasGoogleAds          Boolean        @default(false)
+  adsConfidence         String?
+  googleMapsUrl         String?
+  placeId               String?        @unique
+  email                 String?
+  hours                 String?
+  category              String?
+  lat                   Float?
+  lng                   Float?
+  score                 Int            @default(0)
+  scoreLabel            String         @default("C")
+  callScript            String?
+  websitePrompt         String?
+  scannedAt             DateTime       @default(now())
+  expiresAt             DateTime
+  country               String         @default("US")
+  websiteQuality        String?
+  websiteQualityLabel   String?
+  websiteQualityDetails String[]       @default([])
+  salesAngle            String?
+  pipelineLeads         PipelineLead[]
+
+  @@index([expiresAt])
+  @@index([expiresAt], map: "leads_cache_expiry_idx")
+  @@index([city, state, country, industry], map: "leads_cache_location_idx")
+  @@index([score(sort: Desc)])
+  @@map("leads_cache")
+}
+
+model PipelineLead {
+  id              String        @id @default(cuid())
+  userId          String
+  leadCacheId     String
+  status          LeadStatus    @default(NEW)
+  dealValueUsd    Float?
+  notes           String?
+  meetingAt       DateTime?
+  zoomMeetingId   String?
+  zoomJoinUrl     String?
+  addedAt         DateTime      @default(now())
+  statusChangedAt DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  activityLog     ActivityLog[]
+  followUps       FollowUp[]
+  meetings        Meeting[]
+  leadCache       LeadCache     @relation(fields: [leadCacheId], references: [id])
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@map("pipeline_leads")
+}
+
+model Meeting {
+  id             String        @id @default(cuid())
+  pipelineLeadId String
+  zoomMeetingId  String?
+  zoomJoinUrl    String?
+  scheduledAt    DateTime
+  duration       Int           @default(5)
+  status         MeetingStatus @default(SCHEDULED)
+  createdAt      DateTime      @default(now())
+  pipelineLead   PipelineLead  @relation(fields: [pipelineLeadId], references: [id], onDelete: Cascade)
+
+  @@map("meetings")
+}
+
+model FollowUp {
+  id             String         @id @default(cuid())
+  userId         String
+  pipelineLeadId String
+  type           FollowUpType
+  channel        Channel
+  sentAt         DateTime?
+  scheduledFor   DateTime?
+  status         FollowUpStatus @default(PENDING)
+  error          String?
+  createdAt      DateTime       @default(now())
+  pipelineLead   PipelineLead   @relation(fields: [pipelineLeadId], references: [id], onDelete: Cascade)
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([scheduledFor, status])
+  @@map("follow_ups")
+}
+
+model ActivityLog {
+  id             String       @id @default(cuid())
+  userId         String
+  pipelineLeadId String
+  action         String
+  fromStatus     String?
+  toStatus       String?
+  metadata       Json?
+  createdAt      DateTime     @default(now())
+  pipelineLead   PipelineLead @relation(fields: [pipelineLeadId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([pipelineLeadId])
+  @@map("activity_log")
+}
+
+model DailyStats {
+  id             String   @id @default(cuid())
+  userId         String
+  date           DateTime @db.Date
+  leadsAdded     Int      @default(0)
+  callsMade      Int      @default(0)
+  meetingsBooked Int      @default(0)
+  showedUp       Int      @default(0)
+  closedCount    Int      @default(0)
+  closedValueUsd Float    @default(0)
+  noShows        Int      @default(0)
+  scansUsed      Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@map("daily_stats")
+}
+
+enum Plan {
+  FREE
+  PRO
+  AGENCY
+}
+
+enum ScriptTone {
+  PROFESSIONAL
+  CASUAL
+  AGGRESSIVE
+}
+
+enum LeadStatus {
+  NEW
+  CALLED
+  BOOKED
+  SHOWED
+  CLOSED
+  NOSHOW
+}
+
+enum MeetingStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  NOSHOW
+}
+
+enum FollowUpType {
+  IMMEDIATE
+  REMINDER
+}
+
+enum Channel {
+  EMAIL
+  SMS
+}
+
+enum FollowUpStatus {
+  PENDING
+  SENT
+  FAILED
+}
