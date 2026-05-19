@@ -67,10 +67,8 @@ export async function GET(_req: NextRequest) {
       })
       .filter(Boolean);
 
-    // Pipeline leads by city for conquest data
+ // Pipeline leads by city for conquest data
     const pipelineByCity = [];
-      _count: { id: true },
-    });
 
     return NextResponse.json({ points, total: points.length });
   } catch (err) {
