@@ -203,7 +203,7 @@ export default function PlaybookPage() {
               <li>• Use [PAUSE] or [LISTEN] as stage directions</li>
               <li>• Keep openers under 30 seconds</li>
               <li>• Ask questions — don't pitch immediately</li>
-              <li>• {websiteStatus} is your biggest hook</li>
+             <li>• No website = your biggest hook</li>
               <li>• End with a yes/no question only</li>
             </ul>
           </div>
