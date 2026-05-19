@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     const { scoreLead } = await import("@/lib/scorer");
     const { batchCheckWebsites, checkWebsiteQuality } = await import("@/lib/websiteCheck");
 
-    const rawLeads = await scrapeGoogleMaps(industry, city, state, 60);
+    const rawLeads = await scrapeGoogleMaps(industry, city, state, 100);
 
     if (rawLeads.length === 0) {
       return NextResponse.json({ leads: [], fromCache: false, total: 0 });
@@ -92,7 +92,22 @@ export async function POST(req: NextRequest) {
 
         const placeId = raw.placeId ?? `${raw.businessName}-${city}-${state}-${country}-${i}`;
 
-        const lead = await prisma.leadCache.upsert({
+        let lead;
+let retries = 0;
+while (retries < 3) {
+  try {
+    lead = await prisma.leadCache.upsert({
+      where: { placeId },
+      update: { score, scoreLabel, salesAngle, websiteQuality, websiteQualityLabel, websiteQualityDetails, expiresAt: addDays(new Date(), 1) },
+      create: { city, state, country, industry, businessName: raw.businessName, phone: raw.phone, address: raw.address, websiteUrl: raw.website, rating: raw.rating, reviewCount: raw.reviewCount, hasWebsite, websiteDead, websiteQuality, websiteQualityLabel, websiteQualityDetails, hasGoogleAds: false, googleMapsUrl: raw.googleMapsUrl, placeId, category: raw.category, hours: raw.hours, lat: raw.lat, lng: raw.lng, score, scoreLabel, salesAngle, expiresAt: addDays(new Date(), 1) }
+    });
+    break;
+  } catch (e) {
+    retries++;
+    if (retries >= 3) throw e;
+    await new Promise(r => setTimeout(r, 100));
+  }
+}
           where: { placeId },
           update: {
             score,
