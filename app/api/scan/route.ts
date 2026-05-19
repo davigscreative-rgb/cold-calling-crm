@@ -9,15 +9,7 @@ export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = createServerComponentClient({ cookies });
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
+    
     let body: { state?: string; city?: string; industry?: string; country?: string };
     try {
       body = await req.json();
@@ -29,11 +21,6 @@ export async function POST(req: NextRequest) {
 
     if (!state || !city || !industry) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
-    }
-
-    let user = await prisma.user.findUnique({ where: { email: session.user.email } });
-    if (!user) {
-      user = await prisma.user.create({ data: { email: session.user.email } });
     }
 
     // Cache check
