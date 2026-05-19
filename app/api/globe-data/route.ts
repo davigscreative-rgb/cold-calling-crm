@@ -79,3 +79,4 @@ export async function GET(_req: NextRequest) {
     return NextResponse.json({ points: [], total: 0 });
   }
 }
+

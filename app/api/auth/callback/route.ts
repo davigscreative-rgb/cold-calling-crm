@@ -30,3 +30,4 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.redirect(new URL(next, req.url));
 }
+

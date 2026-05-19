@@ -161,3 +161,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Scan failed. Please try again." }, { status: 500 });
   }
 }
+

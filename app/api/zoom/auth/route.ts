@@ -5,3 +5,4 @@ export async function GET(_req: NextRequest) {
   const url = getZoomAuthUrl();
   return NextResponse.redirect(url);
 }
+

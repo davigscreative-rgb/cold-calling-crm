@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const { leadCacheId } = body;
 
-  const lead = await prisma.leadsCache.findUnique({ where: { id: leadCacheId } });
+  const lead = await prisma.leadCache.findUnique({ where: { id: leadCacheId } });
   if (!lead) return NextResponse.json({ error: "Lead not found" }, { status: 404 });
 
   if (lead.callScript) {
@@ -35,10 +35,12 @@ export async function POST(req: NextRequest) {
     scriptTone: user?.scriptTone ?? "PROFESSIONAL",
   });
 
-  await prisma.leadsCache.update({
+  await prisma.leadCache.update({
     where: { id: leadCacheId },
     data: { callScript: script },
   });
 
   return NextResponse.json({ script });
 }
+
+

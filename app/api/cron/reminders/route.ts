@@ -96,3 +96,4 @@ export async function GET(req: NextRequest) {
   await prisma.$disconnect();
   return NextResponse.json({ ...results, processed: pendingFollowUps.length });
 }
+

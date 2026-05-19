@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
 
   const { leadCacheId } = await req.json();
 
-  const lead = await prisma.leadsCache.findUnique({ where: { id: leadCacheId } });
+  const lead = await prisma.leadCache.findUnique({ where: { id: leadCacheId } });
   if (!lead) return NextResponse.json({ error: "Lead not found" }, { status: 404 });
 
   if (lead.websitePrompt) {
@@ -32,10 +32,12 @@ export async function POST(req: NextRequest) {
     hours: lead.hours,
   });
 
-  await prisma.leadsCache.update({
+  await prisma.leadCache.update({
     where: { id: leadCacheId },
     data: { websitePrompt: prompt },
   });
 
   return NextResponse.json({ prompt });
 }
+
+

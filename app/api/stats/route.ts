@@ -21,3 +21,4 @@ export async function GET(_req: NextRequest) {
 
   return NextResponse.json({ stats, dailyGoal: user.dailyGoalUsd });
 }
+

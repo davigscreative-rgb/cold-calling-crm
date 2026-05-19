@@ -46,3 +46,4 @@ Keep it punchy. Max 100 words total.`;
     return NextResponse.json({ roast: "", opportunity: "" }, { status: 500 });
   }
 }
+

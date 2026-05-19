@@ -43,3 +43,4 @@ Return ONLY the opener line, nothing else. Start with "Hey" or a natural greetin
     return NextResponse.json({ opener: "" }, { status: 500 });
   }
 }
+
