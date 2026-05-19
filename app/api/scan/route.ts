@@ -143,9 +143,8 @@ export async function POST(req: NextRequest) {
     results.sort((a, b) => b.score - a.score);
 
     return NextResponse.json({ leads: results, fromCache: false, total: results.length });
-  } catch (error) {
+ } catch (error) {
     console.error("Scan error:", error);
-    return NextResponse.json({ error: "Scan failed. Please try again." }, { status: 500 });
+    return NextResponse.json({ error: String(error) }, { status: 500 });
   }
 }
-
