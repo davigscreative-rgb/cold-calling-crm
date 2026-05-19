@@ -68,8 +68,7 @@ export async function GET(_req: NextRequest) {
       .filter(Boolean);
 
     // Pipeline leads by city for conquest data
-    const pipelineByCity = await prisma.pipelineLead.groupBy({
-      by: ['city'],
+    const pipelineByCity = [];
       _count: { id: true },
     });
 
